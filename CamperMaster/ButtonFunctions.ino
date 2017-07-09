@@ -5,6 +5,7 @@ void buttonPress(int ThisButton) {
     BB_TRUE(LastButtonStatePack, ThisButton);
     BB_TOGGLE(LightPack, ThisButton );
     StatusChange = 1 ;
+
     setRelays();
     maintainDisplay() ;  
   }

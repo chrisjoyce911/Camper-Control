@@ -15,13 +15,43 @@
  8, 9, 10, 11, 14 (MISO), 15 (SCK), 16 (MOSI).
 
  */
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #include <Wire.h>
 #include "RTClib.h"
 #include "LiquidCrystal.h"
 
+
 RTC_DS1307 RTC;
 LiquidCrystal lcd(38, 39, 40, 41, 42, 43);
+
+
+// SerailHandler
+boolean newData = false;
+const byte numChars = 254;
+char receivedChars[numChars];
+char tempChars[numChars];
+
+struct DATA_STRUCTURE {
+  bool NIGHT_LIGHT ;
+  bool MAIN_LIGHT ;
+  bool BED_LIGHT ;
+  bool KITECHEN_LIGHT ;
+  bool TRAILER_LIGHT ;
+  bool STORAGE_LIGHT ;
+  bool USB_POWER ;
+  bool CPAP_POWER ;
+};
+
+
+struct DATA_STRUCTURE_LIGHT{
+  char type[5];
+  int messageID ;
+  int lightbit ;
+  bool lightstate ;
+  int checksum ;
+};
+DATA_STRUCTURE_LIGHT rxlight;
+
 
 #define BB_TRUE(bp,bb)    bp |= bb
 #define BB_FALSE(bp,bb)   bp &= ~(bb)
@@ -96,8 +126,9 @@ int BUT_CPAP_POWER = 29 ;
 // D53 - Software Serial TX
 
 
+//HardwareSerial & mySerial = Serial1;
+//SoftwareSerial mySerial(52, 53); // RX, TX
 
-SoftwareSerial mySerial(52, 53); // RX, TX
 
 void setup() {
   pinMode(BrightnessPin, OUTPUT); 
@@ -119,8 +150,9 @@ void setup() {
   // Start LCD
   lcd.begin(20, 4);
   refreshDisplay("") ;
-  // Open serial communications and wait for port to open:
+
   Serial.begin(57600);
+  
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -152,8 +184,9 @@ void setup() {
   
   showStatus();
   mytime();
-  // set the data rate for the SoftwareSerial port
-  mySerial.begin(4800); 
+
+  Serial1.begin(9600); 
+
   refreshDisplay("lights") ;
 
 }
@@ -162,17 +195,20 @@ void loop() { // run over and over
   
    if(StatusChange){
       Serial.println(F("Sending New Light Settings"));
-      mySerial.write(LightPack);
       StatusChange = 0 ;
    } 
-    
-  if (mySerial.available()) {
-    LightPack = mySerial.read() ;
-    setRelays();
-    maintainDisplay() ;
-  }
 
-  
+    recvWithStartEndMarkers();
+    if (newData == true) {
+        strcpy(tempChars, receivedChars);
+        parseData();
+        // showParsedData();
+        newData = false;
+    }
+
+    // setRelays();
+    // maintainDisplay() ;
+    
   if ( updatetime >  1000 ) {
       maintainDisplay() ;
       updatetime = 0 ;
@@ -182,8 +218,6 @@ void loop() { // run over and over
   CheckLightButtons () ;
 
 }
-
-
 
 
 
