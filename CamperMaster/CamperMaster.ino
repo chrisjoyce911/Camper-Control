@@ -185,7 +185,7 @@ void setup() {
   showStatus();
   mytime();
 
-  Serial1.begin(9600); 
+  Serial3.begin(9600); 
 
   refreshDisplay("lights") ;
 

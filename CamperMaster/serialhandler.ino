@@ -8,9 +8,9 @@ void recvWithStartEndMarkers() {
     char endMarker = '>';
     char rc;
 
-    while (Serial1.available() > 0 && newData == false) {
-        rc = Serial1.read();
-        Serial.println(rc);
+    while (Serial3.available() > 0 && newData == false) {
+        rc = Serial3.read();
+
         if (recvInProgress == true) {
             if (rc != endMarker) {
                 receivedChars[ndx] = rc;
@@ -18,6 +18,7 @@ void recvWithStartEndMarkers() {
                 if (ndx >= numChars) {
                     ndx = numChars - 1;
                 }
+                
             }
             else {
                 receivedChars[ndx] = '\0'; // terminate the string
