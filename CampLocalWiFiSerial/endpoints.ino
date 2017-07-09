@@ -28,6 +28,7 @@ void toggleNetwork(){
 
 void getStatus(){
   Serial.println("getStatus");
+  sendalllights();
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -37,6 +38,7 @@ void getStatus(){
 void NIGHT_LIGHT(){
   Serial.println("NIGHT_LIGHT");
   BB_TOGGLE(LightPack, BB_NIGHT_LIGHT );
+  sendlight(BB_NIGHT_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -45,6 +47,7 @@ void NIGHT_LIGHT(){
 void MAIN_LIGHT(){
   Serial.println("MAIN_LIGHT");
   BB_TOGGLE(LightPack, BB_MAIN_LIGHT );
+  sendlight(BB_MAIN_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -53,6 +56,7 @@ void MAIN_LIGHT(){
 void BED_LIGHT(){
   Serial.println("BED_LIGHT");
   BB_TOGGLE(LightPack, BB_BED_LIGHT );
+  sendlight(BB_BED_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -61,6 +65,7 @@ void BED_LIGHT(){
 void KITECHEN_LIGHT(){
   Serial.println("KITECHEN_LIGHT");
   BB_TOGGLE(LightPack, BB_KITECHEN_LIGHT );
+  sendlight(BB_KITECHEN_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -69,6 +74,7 @@ void KITECHEN_LIGHT(){
 void TRAILER_LIGHT(){
   Serial.println("TRAILER_LIGHT");
   BB_TOGGLE(LightPack, BB_TRAILER_LIGHT );
+  sendlight(BB_TRAILER_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -77,6 +83,7 @@ void TRAILER_LIGHT(){
 void STORAGE_LIGHT(){
   Serial.println("STORAGE_LIGHT");
   BB_TOGGLE(LightPack, BB_STORAGE_LIGHT );
+  sendlight(BB_STORAGE_LIGHT);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -85,6 +92,7 @@ void STORAGE_LIGHT(){
 void USB_POWER(){
   Serial.println("USB_POWER");
   BB_TOGGLE(LightPack, BB_USB_POWER );
+  sendlight(BB_USB_POWER);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");
@@ -93,6 +101,7 @@ void USB_POWER(){
 void CPAP_POWER(){
   Serial.println("CPAP_POWER");
   BB_TOGGLE(LightPack, BB_CPAP_POWER );
+  sendlight(BB_CPAP_POWER);
   getreply() ;
   server.send(200, "text/html",  message );
   Serial.println("Client servied");

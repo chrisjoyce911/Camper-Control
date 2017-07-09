@@ -132,7 +132,6 @@ void setbody(){
   setbody() ;
   setfooter() ;
   message =  HTMLheader + HTMLbody + HTMLfooter ;
-  showStatus();
-  StatusChange = 1 ;
+  // showStatus();
  }
 
