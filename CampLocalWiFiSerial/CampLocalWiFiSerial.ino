@@ -3,11 +3,31 @@
 #include <ESP8266WebServer.h>
 #include <SoftwareSerial.h>
 
+struct DATA_STRUCTURE_LIGHT{
+  char type[5];
+  int messageID ;
+  int lightbit ;
+  bool lightstate ;
+  int checksum ;
+};
+DATA_STRUCTURE_LIGHT rxlight;
 
-//SSID of your network
-char ssid[] = "My WiFi";
-char ssidAP[] = "My Camper";
-char pass[] = "My WiFi Password";
+
+// SerailHandler
+boolean newData = false;
+const byte numChars = 254;
+char receivedChars[numChars];
+char tempChars[numChars];
+
+
+/*
+ * Add to project 
+ //SSID of your network
+  char ssid[] = "My WiFi";
+  char ssidAP[] = "My Camper";
+  char pass[] = "My WiFi Password";
+*/
+
 
 bool wifiap = false ;
 IPAddress ip(192,168,0,200);  //Node static IP
@@ -26,7 +46,11 @@ ESP8266WebServer server(80);
 // D7     GPIO 13 - 
 // D8     GPIO 15 - 
 
-SoftwareSerial mySerial(5, 4); // RX, TX (
+#define rxPin 5
+#define txPin 4
+
+SoftwareSerial mySerial(rxPin, txPin); // RX, TX 
+//HardwareSerial & mySerial = Serial;
 
 #define BB_TRUE(bp,bb)    bp |= bb
 #define BB_FALSE(bp,bb)   bp &= ~(bb)
@@ -45,10 +69,16 @@ SoftwareSerial mySerial(5, 4); // RX, TX (
 bool StatusChange = 0 ;
 byte LightPack = 0;
 
+int updatetime = 0 ;
+
 String HTMLheader ;
 String HTMLbody ;
 String HTMLfooter ;
 String message ;
+
+#define ARRAYSIZE 10
+String outmessage[ARRAYSIZE] ;
+int messageID = 0 ;
 
 void WiFiAP(){
   Serial.println();
@@ -110,6 +140,7 @@ void startserver()
 
 void setup()
 {
+  
   Serial.begin(57600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -127,7 +158,7 @@ void setup()
 
   showStatus();
 
-  mySerial.begin(4800); 
+  mySerial.begin(9600); 
   
   if (wifiap) {
     WiFiAP();
@@ -142,20 +173,20 @@ void setup()
 void loop () {
   server.handleClient();
 
-   if(StatusChange){
-      Serial.println(F("Sending New Light Settings"));
-      mySerial.write(LightPack);
-      StatusChange = 0 ;
-   } 
-    
-  if (mySerial.available()) {
-    LightPack = mySerial.read() ;
-    showStatus();
-    Serial.write(mySerial.read());
+  sendpackets() ;
 
-  }
+
+  static const unsigned long REFRESH_INTERVAL = 5000; // ms
+  static unsigned long lastRefreshTime = 0;
   
+  if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
+  {
+      lastRefreshTime = millis() ;
+      keepAlive() ;
+  }
+ 
 }
+
 
 void showStatus() {
   Serial.println(F("====================="));
